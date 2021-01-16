@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:hsqldb:file:data/ttrainer
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  application:
+    name: ttrainner-web-app
+
+jsf:
+  PROJECT_STAGE: Development
+
+management:
+  info:
+    git:
+      enabled: true
+      mode: simple
+  endpoints:
+    web:
+      exposure:
+        include: "*"

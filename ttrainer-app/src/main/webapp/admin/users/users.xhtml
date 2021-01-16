@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="#{layoutMB.template}">
+
+    <ui:define name="body-begin">
+        <ui:param name="entityLabel" value="User"/>
+        <ui:param name="bean" value="#{appUsersMB}"/>
+        <ui:param name="formView" value="users-form"/>
+        <ui:param name="title"
+                  value="User listing"/> <!-- Automatic create breadCrumb and page title when param 'title' is provided. -->
+        <ui:param name="writeCapability" value="#{logonMB.hasWriteCapability('admin_users')}"/>
+    </ui:define>
+
+    <ui:define name="description">
+        Find #{entityLabel} by name and email
+    </ui:define>
+
+    <ui:define name="body">
+        <f:validateBean disabled="true">
+            <h:form id="form">
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <div id="main-buttons" class="hidden-sm hidden-xs">
+                            <p:commandButton id="newButton" action="users-form?faces-redirect=true" icon="fa fa-plus"
+                                             value="New" styleClass="btn-primary" rendered="#{writeCapability}"/>
+                            <p:spacer width="5"/>
+                            <p:commandButton value="Delete Selected" icon="fa fa-trash" styleClass="btn-danger"
+                                             action="#{bean.delete}"
+                                             disabled="#{bean.disableDelete()}"
+                                             process="@this" update="@form" rendered="#{writeCapability}"
+                            >
+                                <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-danger"/>
+                            </p:commandButton>
+                            <p:spacer width="5"/>
+                            <p:commandButton value="View selected" update="@(.ui-dialog)" styleClass="btn-info"
+                                             disabled="#{empty bean.selectedEntities or bean.selectedEntities.size() == 0}"
+                                             oncomplete="PF('selectedEntities').show()" icon="fa fa-search"/>
+                        </div>
+
+                        <p:splitButton value="New" action="users-form?faces-redirect=true"
+                                       icon="fa fa-plus" rendered="#{writeCapability}"
+                                       styleClass="hidden-md hidden-lg btn-primary" immediate="true">
+                            <p:menuitem value="Delete Selected" action="#{bean.delete}"
+                                        process="@this" update="@form"
+                                        disabled="#{bean.disableDelete()}"
+                                        rendered="#{writeCapability}"
+                                        icon="fa fa-trash">
+                                <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-danger"/>
+                            </p:menuitem>
+                            <p:menuitem value="View selected" update="@(.ui-dialog)"
+                                        oncomplete="PF('selectedEntities').show()"
+                                        disabled="#{empty bean.selectedEntities or bean.selectedEntities.size() == 0}"
+                                        icon="fa fa-search"
+                            />
+                        </p:splitButton>
+
+                        <p:separator/>
+                        <p:dataTable id="dataTable" widgetVar="entitiesTable" var="c" value="#{bean.entities}"
+                                     rowKey="#{c.name}"
+                                     paginatorPosition="bottom" selection="#{bean.selectedEntities}"
+                        >
+
+                            <p:ajax event="toggleSelect" update="@(.ui-button, .ui-confirm-dialog)"/>
+                            <p:ajax event="rowSelectCheckbox" update="@(.ui-button, .ui-confirm-dialog)"/>
+                            <p:ajax event="rowUnselectCheckbox" update="@(.ui-button, .ui-confirm-dialog)"/>
+                            <p:ajax event="rowSelect" update="@(.ui-button, .ui-confirm-dialog)"/>
+                            <p:ajax event="rowUnselect" update="@(.ui-button, .ui-confirm-dialog)"/>
+
+                            <p:column selectionMode="multiple" width="3%" styleClass="align-center"/>
+
+                            <p:column headerText="Name" sortBy="#{c.name}" filterBy="#{c.name}">
+                                <f:facet name="filter">
+                                    <p:inputText>
+                                        <p:ajax event="keyup" delay="2000" process="@this" update="@none"
+                                                oncomplete="PF('entitiesTable').filter()"/>
+                                    </p:inputText>
+                                </f:facet>
+                                <p:link value="#{c.name}" outcome="user-form.xhtml">
+                                    <f:param name="id" value="#{c.name}"/>
+                                </p:link>
+                            </p:column>
+
+                            <p:column headerText="Email" filterBy="#{c.email}" sortBy="#{c.email}"
+                                      filterMatchMode="contains">
+                                <f:facet name="filter">
+                                    <p:inputText>
+                                        <p:ajax event="keyup" delay="2000" process="@this" update="@none"
+                                                oncomplete="PF('entitiesTable').filter()"/>
+                                    </p:inputText>
+                                </f:facet>
+                                <h:outputText value="#{c.email}"/>
+                            </p:column>
+
+                            <p:column headerText="Roles" filterFunction="#{filterMB.filter}"
+                                      filterBy="#{c.roles}">
+                                <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('entitiesTable').filter()">
+                                    <f:selectItem itemLabel="" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{appUsersMB.rolesValues()}" var="roleName"
+                                                   itemLabel="#{roleName.name}" itemValue="#{roleName}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                                <p:selectCheckboxMenu multiple="true" value="#{c.roles}" filter="true"
+                                                      filterMatchMode="startsWith" disabled="#{not writeCapability}">
+                                    <f:attribute name="collectionType" value="java.util.HashSet"/>
+                                    <f:selectItems value="#{rolesMB.findAll()}" var="roleName"
+                                                   itemLabel="#{roleName.name}" itemValue="#{roleName}"/>
+                                    <p:ajax event="change" listener="#{bean.update(c)}"/>
+                                    <p:ajax event="toggleSelect" listener="#{bean.update(c)}"/>
+                                </p:selectCheckboxMenu>
+                            </p:column>
+                        </p:dataTable>
+                        <p:remoteCommand autoRun="true" action="#{bean.load()}"
+                                         update="dataTable" name="longRunningInit" />
+                    </div>
+                </div>
+                <ui:include src="/includes/components/dialogs/confirmDialog.xhtml"/>
+            </h:form>
+        </f:validateBean>
+
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.upc.ttrainer</groupId>
+    <artifactId>ttrainer-agregator</artifactId>
+    <version>2.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>The Tool for Traners</name>
+
+    <developers>
+        <developer>
+            <id>guilefp00</id>
+            <email>guille.fernandezp26@gmail.com</email>
+            <name>Guillermo Fernandez</name>
+        </developer>
+    </developers>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+
+    <modules>
+        <module>ttrainer-app</module>
+    </modules>
+
+    <dependencyManagement>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.22.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <scm>
+        <url>https://gitlab.appsbroker.com/santander-external/sentinel-admin-tool</url>
+        <developerConnection>scm:git:https://gitlab.appsbroker.com/santander-external/sentinel-admin-tool.git
+        </developerConnection>
+        <tag>master</tag>
+    </scm>
+
+    <distributionManagement>
+    </distributionManagement>
+
+    <repositories>
+    </repositories>
+
+    <pluginRepositories>
+    </pluginRepositories>
+
+    <profiles>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>skipDocker</name>
+                </property>
+            </activation>
+            <properties>
+                <skipDocker>true</skipDocker>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>skipAllTests</id>
+            <activation>
+                <property>
+                    <name>skipTests</name>
+                </property>
+            </activation>
+            <properties>
+                <skipDatabase>true</skipDatabase>
+                <skipApplication>true</skipApplication>
+                <skipDocuments>true</skipDocuments>
+            </properties>
+        </profile>
+
+    </profiles>
+
+</project>

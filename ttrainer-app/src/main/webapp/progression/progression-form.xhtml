@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:adm="http://github.com/adminfaces"
+                template="#{layoutMB.template}">
+
+    <ui:define name="body-begin">
+        <ui:param name="entityLabel" value="Progression"/>
+        <ui:param name="bean" value="#{progressionFormMB}"/>
+        <ui:param name="title" value="Progression Form"/>
+        <ui:param name="writeCapability" value="#{logonMB.hasWriteCapability('progression_progressions')}"/>
+    </ui:define>
+
+    <ui:define name="body">
+        <f:metadata>
+            <f:viewParam name="id" value="#{progressionFormMB.id}"/>
+            <!-- use view action if you are in a Java EE 7 server: <f:viewAction action="#{appUserFormMB.init()}"/>-->
+            <f:event type="preRenderView" listener="#{progressionFormMB.init}"/>
+        </f:metadata>
+
+        <adm:breadcrumb
+                title="#{empty bean.id ? 'New '.concat(entityLabel) : ''.concat(entityLabel).concat(' ').concat(bean.id)}"
+                link="progression-form.jsf?id=#{bean.id}"/>
+        <h:form id="form" prependId="false">
+            <p:focus rendered="#{empty bean.id}"/>
+
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <div id="main-buttons" class="hidden-sm hidden-xs">
+                        <p:commandButton value="Save" action="#{bean.save}" update="@form"
+                                         icon="fa fa-check" styleClass="btn-primary" rendered="#{writeCapability}"/>
+                        <p:spacer width="5" rendered="#{bean.isNew()}"/>
+                        <p:commandButton value="Clear" action="#{bean.clear}" process="@this"
+                                         icon="fa fa-refresh" styleClass="btn-success"
+                                         update="@form" rendered="#{bean.isNew() and writeCapability}"
+                                         resetValues="true"/>
+                        <p:spacer width="5" rendered="#{not bean.isNew()}"/>
+
+                        <p:commandButton value="Delete" action="#{bean.remove}" process="@this"
+                                         rendered="#{not bean.isNew() and writeCapability}" icon="fa fa-trash"
+                                         styleClass="btn-danger">
+                            <f:setPropertyActionListener value="true"
+                                                         target="#{facesContext.externalContext.flash.keepMessages}"/>
+                            <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-danger"/>
+                        </p:commandButton>
+                        <p:spacer width="5"/>
+                        <p:commandButton value="Back" immediate="true"
+                                         action="progressions?faces-redirect=true"
+                                         process="@this"
+                                         icon="fa fa-reply"/>
+                    </div>
+                    <p:splitButton value="Save" action="#{bean.save}" update="@form"
+                                   icon="fa fa-check"
+                                   styleClass="hidden-md hidden-lg btn-primary" rendered="#{writeCapability}">
+                        <p:menuitem value="Reset" action="#{bean.clear}"
+                                    process="@this" update="@form" rendered="#{bean.isNew() and writeCapability}"
+                                    resetValues="true" icon="fa fa-refresh"/>
+                        <p:menuitem value="Delete" action="#{bean.remove}" process="@this"
+                                    rendered="#{not bean.isNew()} and writeCapability}" icon="fa fa-trash"
+                        >
+                            <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-danger"/>
+                        </p:menuitem>
+                        <p:separator/>
+                        <p:menuitem value="Back" action="progressions?faces-redirect=true"
+                                    process="@this" immediate="true"
+                                    icon="fa fa-reply"/>
+                    </p:splitButton>
+
+                    <p:separator/>
+
+                    <div class="ui-g ui-fluid">
+                        <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                            <p:outputLabel value="Id" for="inputId"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                            <p:inputText id="inputId" value="#{bean.entity.id}"
+                                         size="4" disabled="#{not writeCapability}"
+                                         readonly="#{true}" styleClass="form-control"
+                                         style="width: 100%"/>
+                            <p:message for="inputId" display="tooltip"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                            <p:outputLabel value="Date" for="inputDate"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                            <p:datePicker id="inputDate" value="#{bean.entity.date}"
+                                          showButtonBar="true"
+                                          disabled="#{not writeCapability}"
+                            />
+                            <p:message for="inputDate" display="tooltip"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                            <p:outputLabel value="Client" for="inputClient"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                            <p:selectOneMenu id="inputClient" disabled="#{not writeCapability}"
+                                             multiple="false" filter="true" filterMatchMode="startsWith"
+                                             value="#{bean.entity.client}"
+                                             converter="entityConverter">
+                                <f:selectItems value="#{bean.clients}" var="c"
+                                               itemLabel="#{c.name}" itemValue="#{c}"/>
+                            </p:selectOneMenu>
+                            <p:message for="inputClient"/>
+                        </div>
+
+                        <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                            <p:outputLabel value="Weight" for="inputWeight"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                            <p:inputNumber id="inputWeight" value="#{bean.weight}"
+                                           disabled="#{not writeCapability}"
+                                           symbol=" Kg" symbolPosition="s"/>
+                            <p:message for="inputWeight" display="tooltip"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                            <p:outputLabel value="Abdominal Fat" for="inputAbdominalFat"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                            <p:inputNumber id="inputAbdominalFat" value="#{bean.abdominalFat}"
+                                           disabled="#{not writeCapability}"
+                                           symbol=" Kg" symbolPosition="s"/>
+                            <p:message for="inputAbdominalFat" display="tooltip"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                            <p:outputLabel value="Basal Metabolism" for="inputBasalMetabolism"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                            <p:inputNumber id="inputBasalMetabolism" value="#{bean.basalMetabolism}"
+                                           disabled="#{not writeCapability}"
+                                           decimalPlaces="0"
+                                           symbol=" calories/day" symbolPosition="s"/>
+                            <p:message for="inputBasalMetabolism" display="tooltip"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                            <p:outputLabel value="Fat Percentage" for="inputFatPercentage"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                            <p:inputNumber id="inputFatPercentage" value="#{bean.fatPercentage}"
+                                           disabled="#{not writeCapability}"
+                                           decimalPlaces="0"
+                                           symbol=" %" symbolPosition="s"/>
+                            <p:message for="inputFatPercentage" display="tooltip"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                            <p:outputLabel value="Metabolic Age" for="inputMetabolicAge"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                            <p:inputNumber id="inputMetabolicAge" value="#{bean.metabolicAge}"
+                                            disabled="#{not writeCapability}"
+                                           decimalPlaces="0"
+                                           symbol=" years" symbolPosition="s"/>
+                            <p:message for="inputMetabolicAge" display="tooltip"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                            <p:outputLabel value="Muscle Weight" for="inputMuscleWeight"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                            <p:inputNumber id="inputMuscleWeight" value="#{bean.muscleWeight}"
+                                           disabled="#{not writeCapability}"
+                                           symbol=" Kg" symbolPosition="s"/>
+                            <p:message for="inputMuscleWeight" display="tooltip"/>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <ui:include src="/includes/components/dialogs/confirmDialog.xhtml"/>
+        </h:form>
+
+
+    </ui:define>
+
+</ui:composition>

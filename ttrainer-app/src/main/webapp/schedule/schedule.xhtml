@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="#{layoutMB.template}">
+
+    <ui:define name="body-begin">
+        <ui:param name="entityLabel" value="Schedule"/>
+        <ui:param name="bean" value="#{scheduleMB}"/>
+        <ui:param name="title" value="Schedule"/>
+        <!-- Automatic create breadCrumb and page title when param 'title' is provided. -->
+        <ui:param name="writeCapability" value="#{logonMB.hasWriteCapability('schedule_schedule')}"/>
+    </ui:define>
+
+    <ui:define name="description">
+        Manage your dates here
+    </ui:define>
+
+    <ui:define name="body">
+        <h:form>
+            <div class="row">
+                <p:growl id="messages" showDetail="true" life="3000"/>
+                <p:schedule id="schedule" value="#{scheduleMB.eventModel}" widgetVar="myschedule" timeZone="GMT+2">
+
+                    <p:ajax event="dateSelect" listener="#{scheduleMB.onDateSelect}" update="eventDetails"
+                            oncomplete="PF('eventDialog').show();"/>
+                    <p:ajax event="eventSelect" listener="#{scheduleMB.onEventSelect}" update="eventDetails"
+                            oncomplete="PF('eventDialog').show();"/>
+                    <p:ajax event="eventMove" listener="#{scheduleMB.onEventMove}" update="messages"/>
+                    <p:ajax event="eventResize" listener="#{scheduleMB.onEventResize}" update="messages"/>
+
+                </p:schedule>
+                <p:dialog widgetVar="eventDialog" header="Event Details" showEffect="clip" hideEffect="clip"
+                          responsive="true" width="350">
+                    <p:panelGrid id="eventDetails" columns="2" layout="grid" styleClass="ui-fluid">
+                        <p:outputLabel for="client" value="Client:"/>
+                        <p:selectOneMenu id="client" disabled="#{not writeCapability}"
+                                         multiple="false" filter="true" filterMatchMode="startsWith"
+                                         value="#{scheduleMB.event.data}"
+                                         converter="entityConverter">
+                            <f:selectItems value="#{bean.clients}" var="c"
+                                           itemLabel="#{c.name}" itemValue="#{c}"/>
+                        </p:selectOneMenu>
+
+                        <p:outputLabel for="title" value="Title:"/>
+                        <p:inputText id="title" value="#{scheduleMB.event.title}" required="true"/>
+
+                        <p:outputLabel for="from" value="From:"/>
+                        <p:calendar id="from" value="#{scheduleMB.event.startDate}" timeZone="GMT+2"
+                                    pattern="dd/MM/yyyy HH:mm"/>
+
+                        <p:outputLabel for="to" value="To:"/>
+                        <p:calendar id="to" value="#{scheduleMB.event.endDate}" timeZone="GMT+2"
+                                    pattern="dd/MM/yyyy HH:mm"/>
+
+                        <p:outputLabel for="allDay" value="All Day:"/>
+                        <p:selectBooleanCheckbox id="allDay" value="#{scheduleMB.event.allDay}"/>
+
+                    </p:panelGrid>
+                    <f:facet name="footer">
+                        <div class="pull-right" style="padding: 5px">
+                            <p:commandButton type="reset" value="Reset" styleClass="btn-success"/>
+                            <p:spacer height="5"/>
+                            <p:commandButton id="addButton" value="Save" styleClass="btn-primary"
+                                             actionListener="#{scheduleMB.addEvent}"
+                                             oncomplete="PF('myschedule').update();PF('eventDialog').hide();"/>
+                        </div>
+                    </f:facet>
+                </p:dialog>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

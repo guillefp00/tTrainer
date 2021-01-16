@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="#{layoutMB.template}">
+
+    <ui:define name="body-begin">
+        <ui:param name="entityLabel" value="Chart"/>
+        <ui:param name="bean" value="#{chartsMB}"/>
+        <ui:param name="formView" value="progression-form"/>
+        <ui:param name="title"
+                  value="Progression Charts"/> <!-- Automatic create breadCrumb and page title when param 'title' is provided. -->
+        <ui:param name="writeCapability" value="#{logonMB.hasWriteCapability('progression_progressions')}"/>
+    </ui:define>
+
+    <ui:define name="description">
+        Select a client and a scope to see the chart
+    </ui:define>
+
+    <ui:define name="body">
+        <f:validateBean disabled="true">
+            <h:form id="form">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <div class="ui-g ui-fluid">
+                            <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                                <p:outputLabel value="Client" for="inputClient"/>
+                            </div>
+                            <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                                <p:selectOneMenu id="inputClient" disabled="#{not writeCapability}"
+                                                      multiple="false" filter="true" filterMatchMode="startsWith"
+                                                      value="#{bean.selectedClient}">
+                                    <f:selectItems value="#{bean.clients}" var="c"
+                                                   itemLabel="#{c.name}" itemValue="#{c}"/>
+                                    <p:ajax event="change" update="tabView"
+                                            listener="#{bean.clientChanged}" />
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                                <p:outputLabel value="Scope" for="inputScope"/>
+                            </div>
+                            <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                                <p:selectOneMenu id="inputScope" disabled="#{not writeCapability}"
+                                                      multiple="false" filter="true" filterMatchMode="startsWith"
+                                                      value="#{bean.selectedScope}">
+                                    <f:selectItems value="#{bean.scopes}" var="s"
+                                                   itemLabel="#{s.name}" itemValue="#{s}"/>
+                                    <p:ajax event="change" update="tabView"
+                                            listener="#{bean.scopeChanged}" />
+                                </p:selectOneMenu>
+                            </div>
+
+                            <div id="main-buttons" class="ui-sm-12 ui-md-2 ui-lg-1 hidden-sm hidden-xs">
+                                <p:commandButton id="newButton" action="progression-form?faces-redirect=true"
+                                                 icon="fa fa-plus" immediate="true"
+                                                 value="New" styleClass="btn-primary" rendered="#{writeCapability}"/>
+                                <p:spacer width="5"/>
+                            </div>
+                        </div>
+                        <p:separator/>
+                        <p:tabView id="tabView">
+                            <p:tab title="Weight">
+                                <p:lineChart model="#{bean.lineModel}" />
+                            </p:tab>
+                        </p:tabView>
+
+                    </div>
+                </div>
+            </h:form>
+        </f:validateBean>
+    </ui:define>
+
+</ui:composition>

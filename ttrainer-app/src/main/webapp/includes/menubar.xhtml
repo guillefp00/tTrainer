@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:sec="http://www.springframework.org/security/tags">
+
+    <ul class="nav navbar-nav">
+        <li>
+            <p:link href="/index.xhtml" onclick="clearBreadCrumbs()">
+                <i class="fa fa-home"/>
+                <span>Home</span>
+            </p:link>
+        </li>
+
+        <sec:authorize access="hasAnyAuthority('schedule_schedule')">
+            <li class="header">
+                Schedule
+            </li>
+            <sec:authorize access="hasAuthority('schedule_schedule')">
+                <li>
+                    <p:link href="/schedule/schedule.jsf">
+                        <i class="fa fa-calendar-o"></i>
+                        <span>Schedule</span>
+                    </p:link>
+                </li>
+            </sec:authorize>
+        </sec:authorize>
+
+        <sec:authorize access="hasAnyAuthority('progression_progressions')">
+            <li class="header">
+                Progression
+            </li>
+            <sec:authorize access="hasAuthority('progression_progressions')">
+                <li>
+                    <p:link href="/progression/charts.jsf">
+                        <i class="fa fa-line-chart"></i>
+                        <span>Charts</span>
+                    </p:link>
+                </li>
+            </sec:authorize>
+            <sec:authorize access="hasAuthority('progression_progressions')">
+                <li>
+                    <p:link href="/progression/progressions.jsf">
+                        <i class="fa fa-bars"></i>
+                        <span>Progressions</span>
+                    </p:link>
+                </li>
+            </sec:authorize>
+        </sec:authorize>
+
+        <sec:authorize access="hasAnyAuthority('client_clients')">
+            <li class="header">
+                Clients
+            </li>
+            <sec:authorize access="hasAuthority('client_clients')">
+                <li>
+                    <p:link href="/client/clients.jsf">
+                        <i class="fa fa-users"></i>
+                        <span>Clients</span>
+                    </p:link>
+                </li>
+            </sec:authorize>
+        </sec:authorize>
+
+        <sec:authorize access="hasAnyAuthority('admin_users', 'admin_roles', 'admin_capability')">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu multi-level" role="menu">
+                    <sec:authorize access="hasAuthority('admin_users')">
+                        <li>
+                            <p:link href="/admin/users/users.xhtml">
+                                <span>Users </span>
+                                <i class="fa fa-user-md"></i>
+                            </p:link>
+                        </li>
+                    </sec:authorize>
+                    <sec:authorize access="hasAuthority('admin_roles')">
+                        <li>
+                            <p:link href="/admin/roles/roles.xhtml">
+                                <span>Roles </span>
+                                <i class="fa fa-unlock"></i>
+                            </p:link>
+                        </li>
+                    </sec:authorize>
+                    <sec:authorize access="hasAuthority('admin_capabilities')">
+                        <li>
+                            <p:link href="/admin/capabilities/capabilities.jsf">
+                                <i class="fa fa-gift"></i>
+                                <span>Capabilities</span>
+                            </p:link>
+                        </li>
+                    </sec:authorize>
+                </ul>
+            </li>
+        </sec:authorize>
+
+
+    </ul>
+
+</ui:composition>

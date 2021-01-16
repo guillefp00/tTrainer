@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:adm="http://github.com/adminfaces"
+                template="#{layoutMB.template}">
+
+    <ui:define name="body-begin">
+        <ui:param name="entityLabel" value="User"/>
+        <ui:param name="bean" value="#{appUserFormMB}"/>
+        <ui:param name="title" value="User Form"/>
+        <ui:param name="writeCapability" value="#{logonMB.hasWriteCapability('admin_users')}"/>
+    </ui:define>
+
+    <ui:define name="body">
+        <f:metadata>
+            <f:viewParam name="id" value="#{appUserFormMB.id}"/>
+            <!-- use view action if you are in a Java EE 7 server: <f:viewAction action="#{appUserFormMB.init()}"/>-->
+            <f:event type="preRenderView" listener="#{appUserFormMB.init}"/>
+        </f:metadata>
+
+        <adm:breadcrumb
+                title="#{empty bean.id ? 'New '.concat(entityLabel) : ''.concat(entityLabel).concat(' ').concat(bean.id)}"
+                link="users-form.jsf?id=#{bean.id}"/>
+        <h:form id="form" prependId="false">
+            <p:focus rendered="#{empty bean.id}"/>
+
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <div id="main-buttons" class="hidden-sm hidden-xs">
+                        <p:commandButton value="Save" action="#{bean.save}" update="@form"
+                                         icon="fa fa-check" styleClass="btn-primary" rendered="#{writeCapability}"/>
+                        <p:spacer width="5" rendered="#{bean.isNew()}"/>
+                        <p:commandButton value="Clear" action="#{bean.clear}" process="@this"
+                                         icon="fa fa-refresh" styleClass="btn-success"
+                                         update="@form" rendered="#{bean.isNew() and writeCapability}"
+                                         resetValues="true"/>
+                        <p:spacer width="5" rendered="#{not bean.isNew()}"/>
+
+                        <p:commandButton value="Delete" action="#{bean.remove}" process="@this"
+                                         rendered="#{not bean.isNew() and writeCapability}" icon="fa fa-trash"
+                                         styleClass="btn-danger">
+                            <f:setPropertyActionListener value="true"
+                                                         target="#{facesContext.externalContext.flash.keepMessages}"/>
+                            <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-danger"/>
+                        </p:commandButton>
+                        <p:spacer width="5"/>
+                        <p:commandButton value="Back" immediate="true"
+                                         action="users?faces-redirect=true"
+                                         process="@this"
+                                         icon="fa fa-reply"/>
+                    </div>
+                    <p:splitButton value="Save" action="#{bean.save}" update="@form"
+                                   icon="fa fa-check"
+                                   styleClass="hidden-md hidden-lg btn-primary" rendered="#{writeCapability}">
+                        <p:menuitem value="Reset" action="#{bean.clear}"
+                                    process="@this" update="@form" rendered="#{bean.isNew() and writeCapability}"
+                                    resetValues="true" icon="fa fa-refresh"/>
+                        <p:menuitem value="Delete" action="#{bean.remove}" process="@this"
+                                    rendered="#{not bean.isNew()} and writeCapability}" icon="fa fa-trash"
+                        >
+                            <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-danger"/>
+                        </p:menuitem>
+                        <p:separator/>
+                        <p:menuitem value="Back" action="users?faces-redirect=true"
+                                    process="@this" immediate="true"
+                                    icon="fa fa-reply"/>
+                    </p:splitButton>
+
+                    <p:separator/>
+
+                    <div class="ui-g ui-fluid">
+                        <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                            <p:outputLabel value="User" for="inputName"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                            <p:inputText id="inputName" value="#{bean.entity.name}"
+                                         size="4" disabled="#{not writeCapability}"
+                                         readonly="#{not empty bean.id}" styleClass="form-control" style="width: 100%"
+                                         onblur="value=value.toLowerCase()"/>
+                            <p:message for="inputName" display="tooltip"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                            <p:outputLabel for="inputEmail" value="Email"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                            <p:inputText id="inputEmail" value="#{bean.entity.email}" size="4"
+                                         disabled="#{not writeCapability}"
+                                         styleClass="form-control" style="width: 100%" type="mail"/>
+                            <p:message for="inputEmail" display="tooltip"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                            <p:outputLabel value="Password" for="inptPassword"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                            <p:inputText id="inptPassword" value="#{bean.entity.password}" type="password"
+                                         styleClass="form-control" disabled="#{not writeCapability}"/>
+                            <p:message for="inptPassword" display="tooltip"/>
+                        </div>
+
+                        <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                            <p:outputLabel value="Roles" for="inputRoles"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                            <p:selectCheckboxMenu id="inputRoles" label="Roles" disabled="#{not writeCapability}"
+                                                  multiple="true" filter="true" filterMatchMode="startsWith"
+                                                  value="#{bean.entity.roles}">
+                                <f:attribute name="collectionType" value="java.util.HashSet"/>
+                                <f:selectItems value="#{bean.roles}" var="rol"
+                                               itemLabel="#{rol.name}" itemValue="#{rol}"/>
+                            </p:selectCheckboxMenu>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <ui:include src="/includes/components/dialogs/confirmDialog.xhtml"/>
+        </h:form>
+
+
+    </ui:define>
+
+</ui:composition>

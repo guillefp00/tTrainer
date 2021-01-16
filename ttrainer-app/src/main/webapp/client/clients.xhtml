@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="#{layoutMB.template}">
+
+    <ui:define name="body-begin">
+        <ui:param name="entityLabel" value="Client"/>
+        <ui:param name="bean" value="#{clientsMB}"/>
+        <ui:param name="formView" value="client-form"/>
+        <ui:param name="title" value="Clients"/>
+        <ui:param name="writeCapability" value="#{logonMB.hasWriteCapability('client_clients')}"/>
+    </ui:define>
+
+    <ui:define name="description">
+        Manage your #{entityLabel}
+    </ui:define>
+
+    <ui:define name="body">
+        <f:validateBean disabled="true">
+            <h:form id="form">
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <div id="main-buttons" class="hidden-sm hidden-xs">
+                            <p:commandButton id="newButton" action="client-form?faces-redirect=true" icon="fa fa-plus"
+                                             value="New" styleClass="btn-primary" rendered="#{writeCapability}"/>
+                            <p:spacer width="5"/>
+                            <p:commandButton value="Delete Selected" icon="fa fa-trash" styleClass="btn-danger"
+                                             action="#{bean.delete}"
+                                             disabled="#{bean.disableDelete()}"
+                                             process="@this" update="@form" rendered="#{writeCapability}"
+                            >
+                                <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-danger"/>
+                            </p:commandButton>
+                        </div>
+
+                        <p:splitButton value="New" action="client-form?faces-redirect=true"
+                                       icon="fa fa-plus" rendered="#{writeCapability}"
+                                       styleClass="hidden-md hidden-lg btn-primary" immediate="true">
+                            <p:menuitem value="Delete Selected" action="#{bean.delete}"
+                                        process="@this" update="@form"
+                                        disabled="#{bean.disableDelete()}"
+                                        rendered="#{writeCapability}"
+                                        icon="fa fa-trash">
+                                <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-danger"/>
+                            </p:menuitem>
+                        </p:splitButton>
+
+                        <p:separator/>
+                        <p:dataTable id="dataTable" widgetVar="entitiesTable" var="c" value="#{bean.entities}"
+                                     rowKey="#{c.id}"
+                                     paginatorPosition="bottom" selection="#{bean.selectedEntities}"
+                        >
+
+                            <p:ajax event="toggleSelect" update="@(.ui-button, .ui-confirm-dialog)"/>
+                            <p:ajax event="rowSelectCheckbox" update="@(.ui-button, .ui-confirm-dialog)"/>
+                            <p:ajax event="rowUnselectCheckbox" update="@(.ui-button, .ui-confirm-dialog)"/>
+                            <p:ajax event="rowSelect" update="@(.ui-button, .ui-confirm-dialog)"/>
+                            <p:ajax event="rowUnselect" update="@(.ui-button, .ui-confirm-dialog)"/>
+
+                            <p:column selectionMode="multiple" width="3%" styleClass="align-center"/>
+
+                            <p:column headerText="Id" sortBy="#{c.id}" filterBy="#{c.id}">
+                                <f:facet name="filter">
+                                    <p:inputText>
+                                        <p:ajax event="keyup" delay="2000" process="@this" update="@none"
+                                                oncomplete="PF('entitiesTable').filter()"/>
+                                    </p:inputText>
+                                </f:facet>
+                                <p:link value="#{c.id}" outcome="client-form.xhtml">
+                                    <f:param name="id" value="#{c.id}"/>
+                                </p:link>
+                            </p:column>
+
+                            <p:column headerText="Name" sortBy="#{c.name}" filterBy="#{c.name}">
+                                <f:facet name="filter">
+                                    <p:inputText>
+                                        <p:ajax event="keyup" delay="2000" process="@this" update="@none"
+                                                oncomplete="PF('entitiesTable').filter()"/>
+                                    </p:inputText>
+                                </f:facet>
+                                <p:link value="#{c.id}" outcome="client-form.xhtml">
+                                    <f:param name="id" value="#{c.id}"/>
+                                </p:link>
+                            </p:column>
+
+                            <p:column headerText="Email" filterBy="#{c.email}" sortBy="#{c.email}"
+                                      filterMatchMode="contains">
+                                <f:facet name="filter">
+                                    <p:inputText>
+                                        <p:ajax event="keyup" delay="2000" process="@this" update="@none"
+                                                oncomplete="PF('entitiesTable').filter()"/>
+                                    </p:inputText>
+                                </f:facet>
+                                <h:outputText value="#{c.email}"/>
+                            </p:column>
+
+                            <p:column headerText="Phone" filterBy="#{c.phone}" sortBy="#{c.phone}"
+                                      filterMatchMode="contains">
+                                <f:facet name="filter">
+                                    <p:inputText>
+                                        <p:ajax event="keyup" delay="2000" process="@this" update="@none"
+                                                oncomplete="PF('entitiesTable').filter()"/>
+                                    </p:inputText>
+                                </f:facet>
+                                <h:outputText value="#{c.phone}"/>
+                            </p:column>
+
+                            <p:column headerText="Birth Date" filterBy="#{c.birthDate}" sortBy="#{c.birthDate}"
+                                      filterMatchMode="contains">
+                                <f:facet name="filter">
+                                    <p:inputText>
+                                        <p:ajax event="keyup" delay="2000" process="@this" update="@none"
+                                                oncomplete="PF('entitiesTable').filter()"/>
+                                    </p:inputText>
+                                </f:facet>
+                                <h:outputText value="#{c.birthDate}"/>
+                            </p:column>
+
+                            <p:column headerText="Sex" filterBy="#{c.sex}" sortBy="#{c.sex}"
+                                      filterMatchMode="contains">
+                                <f:facet name="filter">
+                                    <p:inputText>
+                                        <p:ajax event="keyup" delay="2000" process="@this" update="@none"
+                                                oncomplete="PF('entitiesTable').filter()"/>
+                                    </p:inputText>
+                                </f:facet>
+                                <h:outputText value="#{c.sex}"/>
+                            </p:column>
+
+                            <p:column headerText="Height" filterBy="#{c.height}" sortBy="#{c.height}"
+                                      filterMatchMode="contains">
+                                <f:facet name="filter">
+                                    <p:inputText>
+                                        <p:ajax event="keyup" delay="2000" process="@this" update="@none"
+                                                oncomplete="PF('entitiesTable').filter()"/>
+                                    </p:inputText>
+                                </f:facet>
+                                <h:outputText value="#{c.height}"/>
+                            </p:column>
+
+                            <p:column headerText="Init Date" filterBy="#{c.initDate}" sortBy="#{c.initDate}"
+                                      filterMatchMode="contains">
+                                <f:facet name="filter">
+                                    <p:inputText>
+                                        <p:ajax event="keyup" delay="2000" process="@this" update="@none"
+                                                oncomplete="PF('entitiesTable').filter()"/>
+                                    </p:inputText>
+                                </f:facet>
+                                <h:outputText value="#{c.initDate}"/>
+                            </p:column>
+                            <p:column headerText="End Date" filterBy="#{c.endDate}" sortBy="#{c.endDate}"
+                                      filterMatchMode="contains">
+                                <f:facet name="filter">
+                                    <p:inputText>
+                                        <p:ajax event="keyup" delay="2000" process="@this" update="@none"
+                                                oncomplete="PF('entitiesTable').filter()"/>
+                                    </p:inputText>
+                                </f:facet>
+                                <h:outputText value="#{c.endDate}"/>
+                            </p:column>
+                        </p:dataTable>
+                        <p:remoteCommand autoRun="true" action="#{bean.load()}"
+                                         update="dataTable" name="longRunningInit"/>
+                    </div>
+                </div>
+                <ui:include src="/includes/components/dialogs/confirmDialog.xhtml"/>
+            </h:form>
+        </f:validateBean>
+
+    </ui:define>
+
+</ui:composition>

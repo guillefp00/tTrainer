@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="#{layoutMB.template}">
+
+    <ui:define name="body-begin">
+        <ui:param name="entityLabel" value="User"/>
+        <ui:param name="bean" value="#{loggedAppUserFormMB}"/>
+        <ui:param name="title" value="User Settings"/>
+    </ui:define>
+
+    <ui:define name="body">
+        <f:metadata>
+            <f:viewParam name="id" value="#{loggedAppUserFormMB.id}"/>
+            <!-- use view action if you are in a Java EE 7 server: <f:viewAction action="#{appUserFormMB.init()}"/>-->
+            <f:event type="preRenderView" listener="#{loggedAppUserFormMB.init}"/>
+        </f:metadata>
+
+        <h:form id="form" prependId="false">
+            <p:focus rendered="#{empty bean.id}"/>
+
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <div id="main-buttons" class="hidden-sm hidden-xs">
+                        <p:commandButton value="Save" action="#{bean.save}" update="@form"
+                                         icon="fa fa-check" styleClass="btn-primary"/>
+                    </div>
+                    <p:commandButton value="Save" action="#{bean.save}" update="@form"
+                                     icon="fa fa-check"
+                                     styleClass="hidden-md hidden-lg btn-primary">
+                    </p:commandButton>
+
+                    <p:separator/>
+
+                    <div class="ui-g ui-fluid">
+                        <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                            <p:outputLabel value="User" for="inputName"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                            <p:inputText id="inputName" value="#{bean.entity.name}"
+                                         size="4"
+                                         readonly="#{not empty bean.id}" styleClass="form-control" style="width: 100%"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                            <p:outputLabel for="inputEmail" value="Email"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                            <p:inputText id="inputEmail" value="#{bean.entity.email}" size="4"
+                                         styleClass="form-control" style="width: 100%" type="mail"/>
+                            <p:messages for="inputEmail" display="tooltip"/>
+                        </div>
+
+                        <div class="ui-sm-12 ui-md-2 ui-lg-1">
+                            <p:outputLabel value="Roles" for="inputRoles"/>
+                        </div>
+                        <div class="ui-sm-12 ui-md-4 ui-lg-5">
+                            <p:selectCheckboxMenu id="inputRoles" label="Roles" disabled="true"
+                                                  multiple="true" filter="true" filterMatchMode="startsWith"
+                                                  value="#{bean.entity.roles}">
+                                <f:selectItems value="#{bean.roles}" var="rol"
+                                               itemLabel="#{rol.name}" itemValue="#{rol}"/>
+                            </p:selectCheckboxMenu>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <ui:include src="/includes/components/dialogs/confirmDialog.xhtml"/>
+        </h:form>
+
+
+    </ui:define>
+
+</ui:composition>
